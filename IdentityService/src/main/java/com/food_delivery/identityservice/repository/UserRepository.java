@@ -10,4 +10,5 @@ import com.food_delivery.identityservice.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
+    void deleteByUsername(String username);
 }

@@ -2,11 +2,19 @@ package com.food_delivery.identityservice.jwt;
 
 
 import java.util.Date;
+import java.util.Map;
+
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 
 @Component
@@ -17,22 +25,24 @@ public class JwtUtil {
     @Value("${jwt.expirationMs}")
     private String expireTimeInMilliSec;
     
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    private SecretKey getSigningSecretKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)); // Use UTF-8 encoding
+
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
+                .claims(Map.of("role", role))
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + Long.parseLong(expireTimeInMilliSec))) 
-                .signWith(getSigningKey())
+                .signWith(getSigningSecretKey())
                 .compact();
     }
 
     public String extractUsername(String token) {
     	return Jwts.parser()
-                .setSigningKey(getSigningKey())  // Updated method
+    			.verifyWith(getSigningSecretKey())
                 .build()
                 .parseSignedClaims(token)  // Updated method
                 .getPayload()
@@ -45,12 +55,24 @@ public class JwtUtil {
 
     public boolean isTokenExpired(String token) {
         return Jwts.parser()
-        		.setSigningKey(getSigningKey())  // Updated method
+        		.verifyWith(getSigningSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration()
                 .before(new Date());
+    }
+    
+    public String extractUserRole(String token) {
+        return getClaims(token).get("role", String.class); // Extracts 'role' claim
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+        		.verifyWith(getSigningSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
 

@@ -37,8 +37,13 @@ public class AuthController {
     	user.setPassword("admin");
     	user.setRole("ADMIN");
     	user.setActive("Y");
-    	authenticationService.register(user);
-        return ResponseEntity.ok(new ApiResponse("Admin user is created successfully", null));
+    	try {
+    		UserDTO userDTO = authenticationService.register(user);
+    		return ResponseEntity.ok(new ApiResponse(user.getUsername() + " is created successfully",userDTO));
+    	} catch (Exception e) {
+    		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ApiResponse(e.getMessage(), null));
+    	}
     }
     
     @PostMapping("/register")
@@ -50,7 +55,6 @@ public class AuthController {
     		return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(new ApiResponse(e.getMessage(), null));
     	}
-        
     }
     
     @PostMapping("/login")

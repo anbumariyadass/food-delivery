@@ -14,6 +14,11 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 @Configuration
 public class DynamoDBConfig {
 	
+	private static final String ACCESS_KEY = "";
+	
+	private static final String SECRET_KEY = "";
+	
+	/*
     @Bean
     DynamoDbClient dynamoDbClient() {
         return DynamoDbClient.builder()
@@ -22,6 +27,17 @@ public class DynamoDBConfig {
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
                         "fakeMyKeyId", "fakeSecretAccessKey"))) // Dummy credentials for local testing
                 .overrideConfiguration(ClientOverrideConfiguration.builder().build())
+                .build();
+    }
+    */
+    
+    @Bean
+    DynamoDbClient dynamoDbClient() {
+        return DynamoDbClient.builder()
+                .region(Region.AP_SOUTH_1) // Change to your actual AWS region
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(ACCESS_KEY, SECRET_KEY)
+                ))
                 .build();
     }
     

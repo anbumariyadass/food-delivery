@@ -1,5 +1,7 @@
 package com.food_delivery.cartservice.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,5 +50,12 @@ public class CartController {
 	public ResponseEntity<String> deleteCart(@PathVariable String cartId) {
 		String response = cartService.deleteCart(cartId);
 		return ResponseEntity.ok(response);
+	}
+	
+	@GetMapping("/allcarts/{customerName}")
+	public ResponseEntity<List<Cart>> getAllCartByCustomerName(@PathVariable String customerName) {
+		System.out.println("customerName:: "+customerName);
+		List<Cart> allCarts = cartService.getCartItemsForUser(customerName);
+		return ResponseEntity.ok(allCarts);
 	}
 }

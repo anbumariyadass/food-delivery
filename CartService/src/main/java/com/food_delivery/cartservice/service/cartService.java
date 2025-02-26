@@ -1,5 +1,7 @@
 package com.food_delivery.cartservice.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,4 +32,9 @@ public class cartService {
 		cartRepository.deleteById(cartId);
 		return cartId +" is deleted successfully";
 	}
+	
+	 public List<Cart> getCartItemsForUser(String customerName) {
+		 System.out.println(customerName);
+	     return cartRepository.findByCustomerName(customerName);
+	 }
 }
